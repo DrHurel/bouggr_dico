@@ -73,7 +73,7 @@ func (this *Node) CheckWord(w string) bool {
 
 }
 
-func (this *Node) CanCreateWork(w string) bool {
+func (this *Node) CanCreateWord(w string) bool {
 
 	next := this
 
