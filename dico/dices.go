@@ -7,7 +7,7 @@ import (
 )
 
 type Dices [16]Dice
-type LetterOptionMap map[string][]string
+type LetterOptionMap map[rune][]rune
 type RemovePatern map[string][][]string
 
 func (this Dices) LetterOption(path ...string) LetterOptionMap {
@@ -19,11 +19,11 @@ func (this Dices) LetterOption(path ...string) LetterOptionMap {
 	for _, l := range allLetter {
 
 		for _, dice := range this {
-			check := make(map[string]bool)
-			if dice.Contains(string(l)) {
+			check := make(map[rune]bool)
+			if dice.Contains(l) {
 				for _, face := range dice {
-					if !check[face] && face != string(l) {
-						res[string(l)] = append(res[string(l)], face)
+					if !check[face] && face != l {
+						res[l] = append(res[l], face)
 						check[face] = true
 					}
 				}
@@ -44,7 +44,7 @@ func (this Dices) LetterOption(path ...string) LetterOptionMap {
 	return res
 }
 
-func numberOfIteration(LetterOption []string, target string) int {
+func numberOfIteration(LetterOption []rune, target rune) int {
 	count := 0
 	for _, l := range LetterOption {
 		if l == target {
@@ -66,11 +66,11 @@ func (this Dices) RemoveIfPick(out ...string) RemovePatern {
 	LetterOptionMap := this.LetterOption(filepath.Join(tmp...))
 	res := make(RemovePatern, 0)
 	for _, letter := range allLetter {
-		n := letterMaxNumber[string(letter)]
+		n := letterMaxNumber[letter]
 		res[string(letter)] = make([][]string, n)
 		for _, letter2 := range allLetter {
 			if letter2 != letter {
-				if count := numberOfIteration(LetterOptionMap[string(letter)], string(letter2)); count != 0 {
+				if count := numberOfIteration(LetterOptionMap[letter], letter2); count != 0 {
 					res[string(letter)][n-count] = append(res[string(letter)][n-count], string(letter2))
 				}
 			}
@@ -91,11 +91,11 @@ func (this Dices) RemoveIfPick(out ...string) RemovePatern {
 
 }
 
-func (this Dices) LetterMaxNumber(path ...string) map[string]int {
+func (this Dices) LetterMaxNumber(path ...string) map[rune]int {
 
-	res := make(map[string]int)
+	res := make(map[rune]int)
 	for _, dice := range this {
-		check := make(map[string]bool)
+		check := make(map[rune]bool)
 		for _, face := range dice {
 			if !check[face] {
 				check[face] = true
@@ -111,6 +111,7 @@ func (this Dices) LetterMaxNumber(path ...string) map[string]int {
 		}
 
 		encoder := json.NewEncoder(file)
+
 		encoder.Encode(res)
 	}
 

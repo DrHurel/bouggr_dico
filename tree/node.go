@@ -56,13 +56,13 @@ func (this *Node[comparable]) Encode(path string) {
 
 }
 
-func (this *Node[rune]) CheckWord(w []rune) bool {
+func (this *Node[string]) CheckWord(w []string) bool {
 
 	next := this
 
 	for _, l := range w {
 
-		if temp, err := next.HasChild(rune(l)); err == nil {
+		if temp, err := next.HasChild(l); err == nil {
 			next = temp
 		} else {
 			return false
@@ -73,7 +73,7 @@ func (this *Node[rune]) CheckWord(w []rune) bool {
 
 }
 
-func (this *Node[rune]) CanCreateWord(w []rune) bool {
+func (this *Node[string]) CanCreateWord(w []string) bool {
 
 	next := this
 

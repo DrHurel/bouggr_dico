@@ -1,8 +1,8 @@
 package dico
 
-type Dice []string
+type Dice []rune
 
-func (this Dice) Contains(letter string) bool {
+func (this Dice) Contains(letter rune) bool {
 
 	for _, l := range this {
 		if l == letter {
