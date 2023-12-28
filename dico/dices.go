@@ -58,23 +58,16 @@ func numberOfIteration(LetterOption []string, target rune) int {
 	return count
 }
 
-func (this Dices) RemoveIfPick(out ...string) RemovePatern {
+func (this Dices) RemoveIfPick(lmn map[string]int, lom LetterOptionMap, out ...string) RemovePatern {
 	allLetter := "ABCDEFGHIJKLMNOPQRSTUVWYXZ"
 
-	path := filepath.Join(out...)
-	tmp := make([]string, len(out))
-	n := copy(tmp, out)
-	tmp[n-1] = "lm-" + out[n-1]
-	letterMaxNumber := this.LetterMaxNumber(filepath.Join(tmp...))
-	tmp[n-1] = "lo-" + out[n-1]
-	LetterOptionMap := this.LetterOption(filepath.Join(tmp...))
-	res := make(RemovePatern, 0)
+	res := make(RemovePatern)
 	for _, letter := range allLetter {
-		n := letterMaxNumber[string(letter)]
+		n := lmn[string(letter)]
 		res[string(letter)] = make([][]string, n)
 		for _, letter2 := range allLetter {
 			if letter2 != letter {
-				if count := numberOfIteration(LetterOptionMap[string(letter)], letter2); count != 0 {
+				if count := numberOfIteration(lom[string(letter)], letter2); count != 0 {
 					res[string(letter)][n-count] = append(res[string(letter)][n-count], string(letter2))
 				}
 			}
@@ -83,14 +76,16 @@ func (this Dices) RemoveIfPick(out ...string) RemovePatern {
 
 	}
 
-	file, err := os.Create(path)
-	if err != nil {
-		panic(err)
+	if len(out) > 0 {
+		path := filepath.Join(out...)
+		file, err := os.Create(path)
+		if err != nil {
+			panic(err)
+		}
+
+		encoder := json.NewEncoder(file)
+		encoder.Encode(res)
 	}
-
-	encoder := json.NewEncoder(file)
-	encoder.Encode(res)
-
 	return res
 
 }
