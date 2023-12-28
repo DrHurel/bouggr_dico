@@ -36,7 +36,7 @@ func RemoveFromTxt(path string, dices Dices, rpPath string) {
 
 		length := len(text)
 
-		if length <= 16 {
+		if length <= 16 && length > 2 {
 			_, err := buf.WriteString(text + "\n")
 			if err != nil {
 				panic("Couldn't replace line")

@@ -32,6 +32,8 @@ func main() {
 
 	//TODO : Etape 3 Suppression de mots pas réalisable
 
+	dico.RemoveFromTxt("dico copy.txt", dices, "./out/test.json")
+
 	//TODO : Etape 4 construction de l'arbre dictionnaire
 
 	log.Print("Done\n")
