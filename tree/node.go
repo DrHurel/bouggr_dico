@@ -6,13 +6,13 @@ import (
 	"os"
 )
 
-type Node struct {
-	Key    string  `json:"k"`
-	Valide int     `json:"v"`
-	Childs []*Node `json:"c"`
+type Node[T comparable] struct {
+	Key    T          `json:"k"`
+	Valide int        `json:"v"`
+	Childs []*Node[T] `json:"c"`
 }
 
-func (this *Node) HasChild(key string) (*Node, error) {
+func (this *Node[comparable]) HasChild(key comparable) (*Node[comparable], error) {
 
 	for _, node := range this.Childs {
 		if node.Key == key {
@@ -23,7 +23,7 @@ func (this *Node) HasChild(key string) (*Node, error) {
 	return this, errors.New("not found")
 }
 
-func (this *Node) Merge(node *Node) bool {
+func (this *Node[comparable]) Merge(node *Node[comparable]) bool {
 	if this.Key == node.Key {
 		this.Childs = append(this.Childs, node.Childs...)
 		return true
@@ -31,7 +31,7 @@ func (this *Node) Merge(node *Node) bool {
 	return false
 }
 
-func (this *Node) Add(node *Node) {
+func (this *Node[comparable]) Add(node *Node[comparable]) {
 	for _, val := range this.Childs {
 		if val.Merge(node) {
 			return
@@ -42,7 +42,7 @@ func (this *Node) Add(node *Node) {
 
 }
 
-func (this *Node) Encode(path string) {
+func (this *Node[comparable]) Encode(path string) {
 
 	if file, err := os.Create(path); err != nil {
 		panic(err)
@@ -56,13 +56,13 @@ func (this *Node) Encode(path string) {
 
 }
 
-func (this *Node) CheckWord(w string) bool {
+func (this *Node[rune]) CheckWord(w []rune) bool {
 
 	next := this
 
 	for _, l := range w {
 
-		if temp, err := next.HasChild(string(l)); err == nil {
+		if temp, err := next.HasChild(rune(l)); err == nil {
 			next = temp
 		} else {
 			return false
@@ -73,13 +73,13 @@ func (this *Node) CheckWord(w string) bool {
 
 }
 
-func (this *Node) CanCreateWord(w string) bool {
+func (this *Node[rune]) CanCreateWord(w []rune) bool {
 
 	next := this
 
 	for _, l := range w {
 
-		if temp, err := next.HasChild(string(l)); err == nil {
+		if temp, err := next.HasChild(l); err == nil {
 			next = temp
 		} else {
 			return false
