@@ -5,6 +5,7 @@ import (
 	"dico"
 	"log"
 	"os"
+	"time"
 	"tree"
 )
 
@@ -18,6 +19,7 @@ func main() {
 	output := os.Args[2]
 
 	log.Print("Generate\n")
+	start := time.Now()
 	origin := new(tree.Node[string])
 	origin.Key = "origin"
 
@@ -84,5 +86,7 @@ func main() {
 
 	origin.Encode(output)
 
-	log.Print("Done\n")
+	elapsed := time.Since(start)
+	log.Printf("Binomial took %s\n", elapsed)
+
 }
