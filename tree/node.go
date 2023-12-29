@@ -12,6 +12,13 @@ type Node[T comparable] struct {
 	Childs []*Node[T] `json:"c"`
 }
 
+func NewNode[T comparable](key T) *Node[T] {
+	temp := new(Node[T])
+	temp.Childs = []*Node[T]{}
+	temp.Key = key
+	return temp
+}
+
 func (this *Node[comparable]) HasChild(key comparable) (*Node[comparable], error) {
 
 	for _, node := range this.Childs {

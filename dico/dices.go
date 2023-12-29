@@ -16,6 +16,8 @@ func checkFace(l rune, lomap LetterOptionMap, dice Dice) {
 
 }
 
+// The `LetterOption` function is a method of the `Dices` type. It calculates the possible options for
+// each letter in the dice set.
 func (this Dices) LetterOption() LetterOptionMap {
 	allLetter := "ABCDEFGHIJKLMNOPQRSTUVWYXZ"
 	print(len(allLetter))

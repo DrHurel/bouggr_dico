@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"dico"
 	"log"
 	"os"
@@ -20,8 +19,6 @@ func main() {
 
 	log.Print("Generate\n")
 	start := time.Now()
-	origin := new(tree.Node[string])
-	origin.Key = "origin"
 
 	dices := dico.Dices{
 		dico.Dice{'E', 'T', 'U', 'K', 'N', 'O'},
@@ -47,46 +44,11 @@ func main() {
 
 	rp := dices.RemoveIfPick(lmn, lom)
 
-	//TODO : Etape 3 Suppression de mots pas réalisable
-
 	dico.RemoveFromTxt(input, dices, rp, lmn)
 
-	//TODO : Etape 4 construction de l'arbre dictionnaire
-
-	f, err := os.OpenFile(input, os.O_RDWR, 0644)
-	if err != nil {
-		panic(err)
-	}
-
-	scanner := bufio.NewScanner(f)
-	//var bs []byte
-	//buf := bytes.NewBuffer(bs)
-
-	var text string
-
-	for scanner.Scan() {
-		text = scanner.Text()
-
-		next := origin
-
-		for _, l := range text {
-			if temp, err := next.HasChild(string(l)); err == nil {
-				next = temp
-			} else {
-				temp = new(tree.Node[string])
-				temp.Childs = []*tree.Node[string]{}
-				temp.Key = string(l)
-				next.Add(temp)
-				next = temp
-			}
-		}
-		next.Valide = 1
-
-	}
-
+	origin := tree.GenerateDicoFromTxt(input)
 	origin.Encode(output)
 
 	elapsed := time.Since(start)
-	log.Printf("Binomial took %s\n", elapsed)
-
+	log.Printf("Took %s\n", elapsed)
 }
