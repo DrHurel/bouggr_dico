@@ -1,14 +1,9 @@
 package dico
 
-import (
-	"encoding/json"
-	"os"
-	"path/filepath"
-)
-
 type Dices [16]Dice
 type LetterOptionMap map[string][]string
 type RemovePatern map[string][][]string
+type IterationCount map[string]int
 
 func checkFace(l rune, lomap LetterOptionMap, dice Dice) {
 	check := make(map[rune]bool)
@@ -18,9 +13,10 @@ func checkFace(l rune, lomap LetterOptionMap, dice Dice) {
 			check[face] = true
 		}
 	}
+
 }
 
-func (this Dices) LetterOption(path ...string) LetterOptionMap {
+func (this Dices) LetterOption() LetterOptionMap {
 	allLetter := "ABCDEFGHIJKLMNOPQRSTUVWYXZ"
 	print(len(allLetter))
 
@@ -33,16 +29,6 @@ func (this Dices) LetterOption(path ...string) LetterOptionMap {
 				checkFace(l, res, dice)
 			}
 		}
-	}
-
-	if len(path) > 0 {
-		file, err := os.Create(path[0])
-		if err != nil {
-			panic(err)
-		}
-
-		encoder := json.NewEncoder(file)
-		encoder.Encode(res)
 	}
 
 	return res
@@ -58,7 +44,7 @@ func numberOfIteration(LetterOption []string, target rune) int {
 	return count
 }
 
-func (this Dices) RemoveIfPick(lmn map[string]int, lom LetterOptionMap, out ...string) RemovePatern {
+func (this Dices) RemoveIfPick(lmn IterationCount, lom LetterOptionMap) RemovePatern {
 	allLetter := "ABCDEFGHIJKLMNOPQRSTUVWYXZ"
 
 	res := make(RemovePatern)
@@ -76,23 +62,13 @@ func (this Dices) RemoveIfPick(lmn map[string]int, lom LetterOptionMap, out ...s
 
 	}
 
-	if len(out) > 0 {
-		path := filepath.Join(out...)
-		file, err := os.Create(path)
-		if err != nil {
-			panic(err)
-		}
-
-		encoder := json.NewEncoder(file)
-		encoder.Encode(res)
-	}
 	return res
 
 }
 
-func (this Dices) LetterMaxNumber(path ...string) map[string]int {
+func (this Dices) LetterMaxNumber() IterationCount {
 
-	res := make(map[string]int)
+	res := make(IterationCount)
 	for _, dice := range this {
 		check := make(map[rune]bool)
 		for _, face := range dice {
@@ -101,17 +77,6 @@ func (this Dices) LetterMaxNumber(path ...string) map[string]int {
 				res[string(face)]++
 			}
 		}
-	}
-
-	if len(path) > 0 {
-		file, err := os.Create(path[0])
-		if err != nil {
-			panic(err)
-		}
-
-		encoder := json.NewEncoder(file)
-
-		encoder.Encode(res)
 	}
 
 	return res
