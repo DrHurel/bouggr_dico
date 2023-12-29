@@ -46,7 +46,7 @@ func numberOfIteration(LetterOption []string, target rune) int {
 	return count
 }
 
-func (this Dices) RemoveIfPick(lmn IterationCount, lom LetterOptionMap) RemovePatern {
+func (this Dices) RemovePaternStruct(lmn IterationCount, lom LetterOptionMap) RemovePatern {
 	allLetter := "ABCDEFGHIJKLMNOPQRSTUVWYXZ"
 
 	res := make(RemovePatern)

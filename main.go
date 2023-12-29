@@ -42,9 +42,9 @@ func main() {
 	lmn := dices.LetterMaxNumber()
 	lom := dices.LetterOption()
 
-	rp := dices.RemoveIfPick(lmn, lom)
+	rp := dices.RemovePaternStruct(lmn, lom)
 
-	dico.RemoveFromTxt(input, dices, rp, lmn)
+	dico.RemoveOfTxt(input, dices, rp, lmn)
 
 	origin := tree.GenerateDicoFromTxt(input)
 	origin.Encode(output)

@@ -20,9 +20,12 @@ func isPossible(word string, interationCount IterationCount, maxAllowed Iteratio
 
 		for _, target := range rp[string(v)] {
 			for i, t := range target {
+
+				// garanti qu'on ne supprise pas des options non voulu
 				if i >= interationCount[string(v)] {
 					break
 				}
+
 				maxAllowed[t]-- //ce que je suis autorisé à avoir
 
 				//le nombre de lettre max est sup au nombre de lettre dans le mot ou on a pas la lettre dans le mot
@@ -41,7 +44,7 @@ func isPossible(word string, interationCount IterationCount, maxAllowed Iteratio
 // The function `RemoveFromTxt` reads a text file, applies certain patterns and conditions to each
 // line, and writes the lines that meet the conditions back to the file.
 
-func RemoveFromTxt(path string, dices Dices, rp RemovePatern, lmn IterationCount) {
+func RemoveOfTxt(path string, dices Dices, rp RemovePatern, lmn IterationCount) {
 
 	var bs []byte
 	var text string

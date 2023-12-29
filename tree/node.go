@@ -6,20 +6,20 @@ import (
 	"os"
 )
 
-type Node[T comparable] struct {
-	Key    T          `json:"k"`
-	Valide int        `json:"v"`
-	Childs []*Node[T] `json:"c"`
+type Node[T comparable, K any] struct {
+	Key    T             `json:"k"`
+	Value  K             `json:"v"`
+	Childs []*Node[T, K] `json:"c"`
 }
 
-func NewNode[T comparable](key T) *Node[T] {
-	temp := new(Node[T])
-	temp.Childs = []*Node[T]{}
+func NewNode[T comparable, K any](key T) *Node[T, K] {
+	temp := new(Node[T, K])
+	temp.Childs = []*Node[T, K]{}
 	temp.Key = key
 	return temp
 }
 
-func (this *Node[comparable]) HasChild(key comparable) (*Node[comparable], error) {
+func (this *Node[T, K]) HasChild(key T) (*Node[T, K], error) {
 
 	for _, node := range this.Childs {
 		if node.Key == key {
@@ -30,7 +30,7 @@ func (this *Node[comparable]) HasChild(key comparable) (*Node[comparable], error
 	return this, errors.New("not found")
 }
 
-func (this *Node[comparable]) Merge(node *Node[comparable]) bool {
+func (this *Node[T, K]) Merge(node *Node[T, K]) bool {
 	if this.Key == node.Key {
 		this.Childs = append(this.Childs, node.Childs...)
 		return true
@@ -38,7 +38,7 @@ func (this *Node[comparable]) Merge(node *Node[comparable]) bool {
 	return false
 }
 
-func (this *Node[comparable]) Add(node *Node[comparable]) {
+func (this *Node[T, K]) Add(node *Node[T, K]) {
 	for _, val := range this.Childs {
 		if val.Merge(node) {
 			return
@@ -49,7 +49,7 @@ func (this *Node[comparable]) Add(node *Node[comparable]) {
 
 }
 
-func (this *Node[comparable]) Encode(path string) {
+func (this *Node[_, _]) Encode(path string) {
 
 	if file, err := os.Create(path); err != nil {
 		panic(err)
@@ -63,7 +63,7 @@ func (this *Node[comparable]) Encode(path string) {
 
 }
 
-func (this *Node[string]) CheckWord(w []string) bool {
+func (this *Node[T, K]) CheckWord(w []T, test K, equal func(K, K) bool) bool {
 
 	next := this
 
@@ -76,11 +76,11 @@ func (this *Node[string]) CheckWord(w []string) bool {
 		}
 	}
 
-	return next.Valide == 1
+	return equal(next.Value, test)
 
 }
 
-func (this *Node[string]) CanCreateWord(w []string) bool {
+func (this *Node[T, _]) CanCreateWord(w []T) bool {
 
 	next := this
 
