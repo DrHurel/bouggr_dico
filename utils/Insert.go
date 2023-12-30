@@ -2,7 +2,7 @@ package utils
 
 func Insert[T any](slice []T, elem T, position int) []T {
 
-	if position > len(slice) {
+	if position > len(slice) || position < 0 {
 		return append(slice, elem)
 	}
 

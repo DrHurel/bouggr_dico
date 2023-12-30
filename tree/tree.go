@@ -29,7 +29,7 @@ func GenerateDicoFromTxt(input string) *Node[string, int] {
 		next := origin
 
 		for _, l := range text {
-			if temp, err := next.HasChild(string(l)); err == nil {
+			if temp, err := next.GetChild(string(l)); err == nil {
 				next = temp
 			} else {
 				temp = NewNode[string, int](string(l))

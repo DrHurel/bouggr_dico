@@ -4,18 +4,25 @@ import (
 	"dico"
 	"log"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 	"tree"
+	"ui"
+	"utils"
 )
 
 func main() {
 
-	if len(os.Args) < 3 {
-		log.Fatal("no input and ouput")
-	}
+	params := ui.GetParams()
 
-	input := os.Args[1]
-	output := os.Args[2]
+	input := os.Args[params[ui.TARGET]]
+	var output string
+	if params[ui.SPECIAL_OUPUT] == -1 {
+		output = "./out/dico.json"
+	} else {
+		output = strings.Split(os.Args[params[ui.SPECIAL_OUPUT]], "=")[1]
+	}
 
 	log.Print("Generate\n")
 	start := time.Now()
@@ -47,7 +54,14 @@ func main() {
 	dico.RemoveOfTxt(input, dices, rp, lmn)
 
 	origin := tree.GenerateDicoFromTxt(input)
-	origin.Encode(output)
+
+	if params[ui.EXPORT_ALL] == 1 {
+		utils.Encode(lmn, filepath.Join(filepath.Dir(output), "lmn.json"))
+		utils.Encode(lom, filepath.Join(filepath.Dir(output), "lom.json"))
+		utils.Encode(rp, filepath.Join(filepath.Dir(output), "remove-patern.json"))
+	}
+
+	utils.Encode(origin, output)
 
 	elapsed := time.Since(start)
 	log.Printf("Took %s\n", elapsed)
