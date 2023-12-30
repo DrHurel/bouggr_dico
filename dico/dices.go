@@ -1,6 +1,11 @@
 package dico
 
-type Dices [16]Dice
+import (
+	"bufio"
+	"os"
+)
+
+type Dices []Dice
 type LetterOptionMap map[string][]string
 type RemovePatern map[string][][]string
 type IterationCount map[string]int
@@ -79,6 +84,29 @@ func (this Dices) LetterMaxNumber() IterationCount {
 				res[string(face)]++
 			}
 		}
+	}
+
+	return res
+}
+
+func GetDicesFromTxt(path string) Dices {
+	res := Dices{}
+
+	f, err := os.OpenFile(path, os.O_RDWR, 0644)
+	if err != nil {
+		panic(err)
+	}
+
+	scanner := bufio.NewScanner(f)
+
+	for scanner.Scan() {
+		text := scanner.Text()
+		temp := Dice{}
+		for _, l := range text {
+			temp = append(temp, l)
+		}
+		res = append(res, temp)
+
 	}
 
 	return res

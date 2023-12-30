@@ -46,6 +46,10 @@ func main() {
 		dico.Dice{'E', 'N', 'H', 'R', 'I', 'S'},
 	}
 
+	if params[ui.DICE_FILE] != -1 {
+		dices = dico.GetDicesFromTxt(strings.Split(os.Args[params[ui.DICE_FILE]], "=")[1])
+	}
+
 	//EN
 	/*
 		dices = dico.Dices{
