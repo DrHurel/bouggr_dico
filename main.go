@@ -46,6 +46,28 @@ func main() {
 		dico.Dice{'E', 'N', 'H', 'R', 'I', 'S'},
 	}
 
+	//EN
+	/*
+		dices = dico.Dices{
+			dico.Dice{'R', 'I', 'F', 'O', 'B', 'X'},
+			dico.Dice{'I', 'F', 'E', 'H', 'E', 'Y'},
+			dico.Dice{'D', 'E', 'N', 'O', 'W', 'S'},
+			dico.Dice{'U', 'T', 'O', 'K', 'N', 'D'},
+			dico.Dice{'H', 'M', 'S', 'R', 'A', 'O'},
+			dico.Dice{'L', 'U', 'P', 'E', 'T', 'S'},
+			dico.Dice{'A', 'C', 'I', 'T', 'O', 'A'},
+			dico.Dice{'Q', 'B', 'M', 'J', 'O', 'A'},
+			dico.Dice{'E', 'H', 'I', 'S', 'P', 'N'},
+			dico.Dice{'V', 'E', 'T', 'I', 'G', 'N'},
+			dico.Dice{'G', 'L', 'E', 'N', 'Y', 'U'},
+			dico.Dice{'B', 'A', 'L', 'I', 'Y', 'T'},
+			dico.Dice{'E', 'Z', 'A', 'V', 'N', 'D'},
+			dico.Dice{'R', 'A', 'L', 'E', 'S', 'C'},
+			dico.Dice{'U', 'W', 'I', 'L', 'R', 'G'},
+			dico.Dice{'P', 'A', 'C', 'E', 'M', 'D'},
+		}
+	*/
+
 	lmn := dices.LetterMaxNumber()
 	lom := dices.LetterOption()
 
