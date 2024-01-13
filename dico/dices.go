@@ -2,6 +2,7 @@ package dico
 
 import (
 	"bufio"
+	"math/rand"
 	"os"
 )
 
@@ -110,4 +111,23 @@ func GetDicesFromTxt(path string) Dices {
 	}
 
 	return res
+}
+
+func (dices Dices) Roll(r *rand.Rand) [4][4]rune {
+	var grid [4][4]rune
+
+	r.Shuffle(len(dices), func(i, j int) {
+		dices[i], dices[j] = dices[j], dices[i]
+	})
+	k := 0
+	for i := range grid {
+		for j := range grid {
+
+			faces := r.Intn(5)
+
+			grid[i][j] = dices[k][faces]
+			k++
+		}
+	}
+	return grid
 }

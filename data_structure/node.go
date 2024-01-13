@@ -1,32 +1,53 @@
-package tree
+package data_structure
 
 import (
 	"errors"
 )
 
 type Node[T comparable, K any] struct {
-	Key    T             `json:"k"`
-	Value  K             `json:"v"`
-	Childs []*Node[T, K] `json:"c"`
+	Key        T             `json:"k"`
+	Value      K             `json:"v"`
+	Children   []*Node[T, K] `json:"c"`
+	parent     *Node[T, K]
+	accessible bool
 }
 
 func NewNode[T comparable, K any](key T) *Node[T, K] {
 	temp := new(Node[T, K])
-	temp.Childs = []*Node[T, K]{}
+	temp.Children = []*Node[T, K]{}
 	temp.Key = key
 	return temp
+}
+
+func (this *Node[T, _]) Mark(w []T) {
+	next := this
+
+	for _, l := range w {
+		next.accessible = true
+		if temp, err := next.GetChild(l); err == nil {
+			next = temp
+
+		} else {
+			return
+		}
+	}
+
 }
 
 /*
 Quick way to know if a node has children
 */
 func (this *Node[T, K]) HasChildren() bool {
-	return len(this.Childs) != 0
+	return len(this.Children) != 0
+}
+
+func (this *Node[T, K]) Parent() *Node[T, K] {
+	return this.parent
 }
 
 func (this *Node[T, K]) GetChild(key T) (*Node[T, K], error) {
 
-	for _, node := range this.Childs {
+	for _, node := range this.Children {
 		if node.Key == key {
 			return node, nil
 		}
@@ -37,20 +58,24 @@ func (this *Node[T, K]) GetChild(key T) (*Node[T, K], error) {
 
 func (this *Node[T, K]) Merge(node *Node[T, K]) bool {
 	if this.Key == node.Key {
-		this.Childs = append(this.Childs, node.Childs...)
+		for _, n := range node.Children {
+			n.parent = this
+		}
+		this.Children = append(this.Children, node.Children...)
 		return true
 	}
 	return false
 }
 
 func (this *Node[T, K]) Add(node *Node[T, K]) {
-	for _, val := range this.Childs {
+
+	for _, val := range this.Children {
 		if val.Merge(node) {
 			return
 		}
 	}
-
-	this.Childs = append(this.Childs, node)
+	node.parent = this
+	this.Children = append(this.Children, node)
 
 }
 

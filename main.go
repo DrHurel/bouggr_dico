@@ -1,23 +1,30 @@
 package main
 
 import (
+	"data_structure"
 	"dico"
 	"log"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
-	"tree"
 	"ui"
 	"utils"
 )
 
 func main() {
 
-	params := ui.GetParams()
+	var wg sync.WaitGroup
 
-	input := os.Args[params[ui.TARGET]]
 	var output string
+	var lmn dico.IterationCount
+	var lom dico.LetterOptionMap
+
+	params := ui.GetParams()
+	input := os.Args[params[ui.TARGET]]
+
 	if params[ui.SPECIAL_OUPUT] == -1 {
 		output = "./out/dico.json"
 	} else {
@@ -45,11 +52,11 @@ func main() {
 		dico.Dice{'A', 'I', 'M', 'S', 'O', 'R'},
 		dico.Dice{'E', 'N', 'H', 'R', 'I', 'S'},
 	}
-
-	if params[ui.DICE_FILE] != -1 {
-		dices = dico.GetDicesFromTxt(strings.Split(os.Args[params[ui.DICE_FILE]], "=")[1])
-	}
-
+	/*
+		if params[ui.DICE_FILE] != -1 {
+			dices = dico.GetDicesFromTxt(strings.Split(os.Args[params[ui.DICE_FILE]], "=")[1])
+		}
+	*/
 	//EN
 	/*
 		dices = dico.Dices{
@@ -72,23 +79,78 @@ func main() {
 		}
 	*/
 
-	lmn := dices.LetterMaxNumber()
-	lom := dices.LetterOption()
+	wg.Add(2)
+	go func() {
+		lmn = dices.LetterMaxNumber()
+		defer wg.Done()
+	}()
 
+	go func() {
+		lom = dices.LetterOption()
+		defer wg.Done()
+	}()
+
+	wg.Wait()
 	rp := dices.RemovePaternStruct(lmn, lom)
 
 	dico.RemoveOfTxt(input, dices, rp, lmn)
 
-	origin := tree.GenerateDicoFromTxt(input)
+	origin := data_structure.GenerateDicoFromTxt(input)
+	d := []rune{}
+	for _, dice := range dices {
+		d = append(d, dice...)
+	}
+	//used := make([]bool, len(d))
+	//dico.PaintGraph(origin, []rune{}, d, 6, used, 0)
 
 	if params[ui.EXPORT_ALL] == 1 {
-		utils.Encode(lmn, filepath.Join(filepath.Dir(output), "lmn.json"))
-		utils.Encode(lom, filepath.Join(filepath.Dir(output), "lom.json"))
-		utils.Encode(rp, filepath.Join(filepath.Dir(output), "remove-patern.json"))
+		wg.Add(3)
+		go func() {
+			utils.Encode(lmn, filepath.Join(filepath.Dir(output), "lmn.json"))
+			defer wg.Done()
+		}()
+		go func() {
+			utils.Encode(lom, filepath.Join(filepath.Dir(output), "lom.json"))
+			defer wg.Done()
+		}()
+		go func() {
+			utils.Encode(rp, filepath.Join(filepath.Dir(output), "remove-patern.json"))
+			defer wg.Done()
+		}()
 	}
 
 	utils.Encode(origin, output)
-
+	wg.Wait()
 	elapsed := time.Since(start)
 	log.Printf("Took %s\n", elapsed)
+
+	r := rand.New(rand.NewSource(int64(time.Now().Nanosecond() * int(elapsed))))
+
+	grid := dices.Roll(r)
+
+	print("\n")
+	utils.PrintGrid(grid)
+	print("\n")
+	start = time.Now()
+
+	allw := dico.AllWordInGrid(grid, origin)
+	elapsed = time.Since(start)
+
+	for _, e := range allw {
+		println(e)
+	}
+	log.Printf("Took %s\n", elapsed)
+
+	// stat := float64(0)
+	// for i := 0; i < 10000; i++ {
+	// 	r = rand.New(rand.NewSource(int64(time.Now().Nanosecond() * time.Now().Nanosecond() * i)))
+
+	// 	grid = dices.Roll(r)
+
+	// 	stat += float64(len(dico.AllWordInGrid(grid, origin)))
+	// }
+
+	// log.Printf("%f mot en moyenne\n", float64(stat/10000))
+
+	return
 }
