@@ -3,7 +3,7 @@ package main
 import (
 	"data_structure"
 	"dico"
-	"log"
+	"fmt"
 	"math/rand"
 	"os"
 	"path/filepath"
@@ -22,8 +22,14 @@ func main() {
 	var lmn dico.IterationCount
 	var lom dico.LetterOptionMap
 
-	params := ui.GetParams()
-	input := os.Args[params[ui.TARGET]]
+	// Get Params
+	params, option := ui.GetParams()
+	if option {
+		ui.PrintHelp()
+		return
+	}
+
+	input := os.Args[1]
 
 	if params[ui.SPECIAL_OUPUT] == -1 {
 		output = "./out/dico.json"
@@ -31,7 +37,7 @@ func main() {
 		output = strings.Split(os.Args[params[ui.SPECIAL_OUPUT]], "=")[1]
 	}
 
-	log.Print("Generate\n")
+	fmt.Print("Generate\n")
 	start := time.Now()
 
 	dices := dico.Dices{
@@ -52,11 +58,10 @@ func main() {
 		dico.Dice{'A', 'I', 'M', 'S', 'O', 'R'},
 		dico.Dice{'E', 'N', 'H', 'R', 'I', 'S'},
 	}
-	/*
-		if params[ui.DICE_FILE] != -1 {
-			dices = dico.GetDicesFromTxt(strings.Split(os.Args[params[ui.DICE_FILE]], "=")[1])
-		}
-	*/
+
+	if params[ui.RULES_FILES] != -1 {
+		dices = dico.GetDicesFromTxt(strings.Split(os.Args[params[ui.RULES_FILES]], "=")[1])
+	}
 	//EN
 	/*
 		dices = dico.Dices{
@@ -100,8 +105,6 @@ func main() {
 	for _, dice := range dices {
 		d = append(d, dice...)
 	}
-	//used := make([]bool, len(d))
-	//dico.PaintGraph(origin, []rune{}, d, 6, used, 0)
 
 	if params[ui.EXPORT_ALL] == 1 {
 		wg.Add(3)
@@ -122,35 +125,62 @@ func main() {
 	utils.Encode(origin, output)
 	wg.Wait()
 	elapsed := time.Since(start)
-	log.Printf("Took %s\n", elapsed)
+	fmt.Printf("Took %s\n", elapsed)
 
-	r := rand.New(rand.NewSource(int64(time.Now().Nanosecond() * int(elapsed))))
+	r := rand.New(rand.NewSource(int64(time.Now().Nanosecond()) * elapsed.Nanoseconds()))
 
 	grid := dices.Roll(r)
 
-	print("\n")
+	fmt.Print("\n")
 	utils.PrintGrid(grid)
-	print("\n")
+	fmt.Print("\n")
 	start = time.Now()
 
 	allw := dico.AllWordInGrid(grid, origin)
 	elapsed = time.Since(start)
 
 	for _, e := range allw {
-		println(e)
+		fmt.Println(e)
 	}
-	log.Printf("Took %s\n", elapsed)
+	fmt.Printf("\nTook %s\n", elapsed)
 
-	// stat := float64(0)
-	// for i := 0; i < 10000; i++ {
-	// 	r = rand.New(rand.NewSource(int64(time.Now().Nanosecond() * time.Now().Nanosecond() * i)))
+	if params[ui.FORCE] != 1 {
+		var stat float64 = 0
+		var distrition [17]int
+		value := make([]float64, 0)
+		min := 100
+		max := 0
+		var statSpeed time.Duration = 0
 
-	// 	grid = dices.Roll(r)
+		for i := 0; i < 10000; i++ {
 
-	// 	stat += float64(len(dico.AllWordInGrid(grid, origin)))
-	// }
+			grid = dices.Roll(r)
+			start = time.Now()
+			list := dico.AllWordInGrid(grid, origin)
+			statSpeed += time.Since(start)
+			n := len(list)
+			if n < min {
+				min = n
+			}
+			if n > max {
+				max = n
+			}
+			stat += float64(n)
+			value = append(value, float64(n))
+			for _, e := range list {
 
-	// log.Printf("%f mot en moyenne\n", float64(stat/10000))
+				distrition[len(e)]++
+			}
+		}
+		mean := float64(stat / 10000)
 
+		fmt.Printf("min : %d | max %d | ecart-type %f | mean %f | avg speed %dms |Q1 %f Q2%f | Q3%f \n", min, max, mean, utils.EcartType(value, mean), statSpeed.Microseconds()/int64(stat), utils.NthTile(value, 1, 4), utils.NthTile(value, 2, 4), utils.NthTile(value, 3, 4))
+		for i, e := range distrition {
+			fmt.Printf("Nombre de mots de longueur %d : %d \npourcentage  : %f%s\n", i, e, float64(e)*100/stat, "%")
+
+		}
+
+		fmt.Printf("Nombre total de mots %f", stat)
+	}
 	return
 }

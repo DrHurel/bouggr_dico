@@ -62,7 +62,7 @@ func allWordInGrid[T string | rune](Grid [4][4]T, dico *data_structure.Node[rune
 			go func(wg *sync.WaitGroup, i, j int) {
 				defer wg.Done()
 
-				appendAllWordFromGrid(
+				appendAllWordFromPoint(
 					ch,
 
 					Grid,
@@ -79,7 +79,7 @@ func allWordInGrid[T string | rune](Grid [4][4]T, dico *data_structure.Node[rune
 	return
 }
 
-func appendAllWordFromGrid[T string | rune](res chan string,
+func appendAllWordFromPoint[T string | rune](res chan string,
 	G [4][4]T,
 	dico *data_structure.Node[rune, int],
 	word string, i, j int, used [4][4]bool) {
@@ -103,7 +103,7 @@ func appendAllWordFromGrid[T string | rune](res chan string,
 				used[i+a][j+b] = true
 				word += string(G[i+a][j+b])
 
-				appendAllWordFromGrid(res, G, dico, word, i+a, j+b, used)
+				appendAllWordFromPoint(res, G, dico, word, i+a, j+b, used)
 				word = word[:len(word)-1]
 				used[i+a][j+b] = false
 			}
@@ -114,8 +114,8 @@ func appendAllWordFromGrid[T string | rune](res chan string,
 
 func canPickAletter(i int, j int, used [4][4]bool) bool {
 	possible := false
-	for _, a := range []int{-1, 1} {
-		for _, b := range []int{-1, 1} {
+	for _, a := range []int{-1, 0, 1} {
+		for _, b := range []int{-1, 0, 1} {
 			if i+a >= 0 && j+b >= 0 && i+a < 4 && j+b < 4 {
 				possible = possible || !used[i+a][j+b]
 			}

@@ -1,11 +1,13 @@
 package utils
 
+import "fmt"
+
 func PrintGrid(Grid [4][4]rune) {
 	for _, e := range Grid {
 		for _, c := range e {
-			print(string(c))
+			fmt.Print(string(c))
 		}
-		print("\n")
+		fmt.Print("\n")
 	}
 
 }
