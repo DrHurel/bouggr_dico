@@ -3,6 +3,7 @@ package ui
 import (
 	"os"
 	"regexp"
+	"strings"
 )
 
 type Args string
@@ -10,15 +11,16 @@ type ArgsMap map[Args]int
 type conversionMap map[Args]Args
 
 const (
-	EXPORT_ALL            Args = "--export-all"
-	EXPORT_ALL_COMPRESSED Args = "-ea"
-	SPECIAL_OUPUT         Args = "--out="
-	RULES_FILES           Args = "--rules="
-	NO_PARSE              Args = "--no-parse"
-	NO_PARSE_COMPRESSED   Args = "-np"
-	FORCE                 Args = "--force"
-	FORCE_COMPRESSED      Args = "-F"
-	HELP                  Args = "--help"
+	EXPORT_ALL            Args   = "--export-all"
+	EXPORT_ALL_COMPRESSED Args   = "-ea"
+	SPECIAL_OUPUT         Args   = "--out="
+	RULES_FILES           Args   = "--rules="
+	NO_PARSE              Args   = "--no-parse"
+	NO_PARSE_COMPRESSED   Args   = "-np"
+	FORCE                 Args   = "--force"
+	FORCE_COMPRESSED      Args   = "-F"
+	HELP                  Args   = "--help"
+	STANDARD_OUTPUT       string = "./out/dico.json"
 )
 
 func GetParams() (ArgsMap, bool) {
@@ -64,4 +66,13 @@ func GetParams() (ArgsMap, bool) {
 	}
 
 	return res, false
+}
+
+func GetOutput(params ArgsMap, output string) string {
+	if params[SPECIAL_OUPUT] != -1 {
+		output = strings.Split(os.Args[params[SPECIAL_OUPUT]], "=")[1]
+	} else {
+		output = STANDARD_OUTPUT
+	}
+	return output
 }
