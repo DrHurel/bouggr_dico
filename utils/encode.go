@@ -2,8 +2,10 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
+	"ui"
 )
 
 func Encode(v any, path ...string) {
@@ -16,14 +18,18 @@ func Encode(v any, path ...string) {
 			os.Mkdir(filepath.Dir(out), 777)
 			file, err = os.Create(out)
 			if err != nil {
-				panic(err)
+				fmt.Print(err, '\n')
+				ui.PrintHelp()
+				os.Exit(0)
 			}
 		}
 
 		encoder := json.NewEncoder(file)
 		err = encoder.Encode(v)
 		if err != nil {
-			panic(err)
+			fmt.Print(err, '\n')
+			ui.PrintHelp()
+			os.Exit(0)
 		}
 	}
 

@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"errors"
 	"os"
 	"regexp"
 )
@@ -25,10 +24,11 @@ const (
 func GetParams() (ArgsMap, bool) {
 
 	if len(os.Args) < 2 {
-		panic(errors.New("No target"))
+		PrintHelp()
+		os.Exit(0)
 	}
 
-	if os.Args[0] == string(HELP) {
+	if os.Args[1] == string(HELP) {
 		return nil, true
 	}
 

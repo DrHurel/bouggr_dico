@@ -2,7 +2,9 @@ package data_structure
 
 import (
 	"bufio"
+	"fmt"
 	"os"
+	"ui"
 	"utils"
 )
 
@@ -18,7 +20,9 @@ func GenerateDicoFromTxt(input string) *Node[rune, int] {
 
 	f, err := os.OpenFile(input, os.O_RDWR, 0644)
 	if err != nil {
-		panic(err)
+		fmt.Print(err, '\n')
+		ui.PrintHelp()
+		os.Exit(0)
 	}
 
 	scanner := bufio.NewScanner(f)

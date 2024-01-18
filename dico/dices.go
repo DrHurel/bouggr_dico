@@ -2,8 +2,10 @@ package dico
 
 import (
 	"bufio"
+	"fmt"
 	"math/rand"
 	"os"
+	"ui"
 )
 
 type Dices []Dice
@@ -95,7 +97,9 @@ func GetDicesFromTxt(path string) Dices {
 
 	f, err := os.OpenFile(path, os.O_RDWR, 0644)
 	if err != nil {
-		panic(err)
+		fmt.Print(err, '\n')
+		ui.PrintHelp()
+		os.Exit(0)
 	}
 
 	scanner := bufio.NewScanner(f)

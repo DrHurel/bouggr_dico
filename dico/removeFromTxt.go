@@ -3,7 +3,9 @@ package dico
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"os"
+	"ui"
 )
 
 func isPossible(word string, interationCount IterationCount, maxAllowed IterationCount, rp RemovePatern) bool {
@@ -54,7 +56,9 @@ func RemoveOfTxt(path string, dices Dices, rp RemovePatern, lmn IterationCount) 
 
 	f, err := os.OpenFile(path, os.O_RDWR, 0644)
 	if err != nil {
-		panic(err)
+		fmt.Print(err, '\n')
+		ui.PrintHelp()
+		os.Exit(0)
 	}
 
 	scanner := bufio.NewScanner(f)
