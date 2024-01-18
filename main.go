@@ -95,8 +95,9 @@ func main() {
 
 	wg.Wait()
 	rp := dices.RemovePaternStruct(lmn, lom)
-
-	dico.RemoveOfTxt(input, dices, rp, lmn)
+	if params[ui.NO_PARSE] == -1 {
+		dico.RemoveOfTxt(input, dices, rp, lmn)
+	}
 
 	origin := data_structure.GenerateDicoFromTxt(input)
 	d := []rune{}
