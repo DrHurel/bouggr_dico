@@ -84,6 +84,9 @@ func (this *Node[T, K]) Add(node *Node[T, K]) {
 func (this *Node[T, K]) CheckWord(w []T, test K, equal func(K, K) bool) bool {
 
 	next := this
+	if len(w) < 3 {
+		return false
+	}
 
 	for _, l := range w {
 

@@ -16,26 +16,22 @@ func isPossible(word string, interationCount IterationCount, maxAllowed Iteratio
 		// on a forcément la lettre dans le mots
 		possible = maxAllowed[string(v)] >= interationCount[string(v)] && possible
 
-		if !possible { //une fois que possible est faux elle le reste : reduit la complexité en moyenne
-			return false
-		}
+	}
 
-		for _, target := range rp[string(v)] {
-			for i, t := range target {
+	for v, n := range interationCount {
+		for i := 0; i < n; i++ {
+			for _, target := range rp[string(v)] {
+				borneSup := min(len(target), i)
+				for _, t := range target[:borneSup] {
 
-				// garanti qu'on ne supprise pas des options non voulu
-				if i >= interationCount[string(v)] {
-					break
+					maxAllowed[t]-- //ce que je suis autorisé à avoir
+
+					//le nombre de lettre max est sup au nombre de lettre dans le mot ou on a pas la lettre dans le mot
+					possible = (maxAllowed[t] >= interationCount[t] || interationCount[t] <= 0) && possible
+
 				}
-
-				maxAllowed[t]-- //ce que je suis autorisé à avoir
-
-				//le nombre de lettre max est sup au nombre de lettre dans le mot ou on a pas la lettre dans le mot
-				possible = (maxAllowed[t] >= interationCount[t] || interationCount[t] == 0) && possible
-
 			}
 		}
-
 	}
 
 	//on renvoit pas vrai pour le cas où la dernière lettre rend possible faux

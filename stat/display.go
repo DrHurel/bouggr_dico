@@ -14,6 +14,7 @@ func Display(grid [4][4]rune,
 	r *rand.Rand,
 	start time.Time,
 	origin *data_structure.Node[rune, int],
+	noParsed *data_structure.Node[rune, int],
 ) {
 	var stat float64 = 0
 	var distrition [17]int
@@ -21,12 +22,19 @@ func Display(grid [4][4]rune,
 	min := 100
 	max := 0
 	var statSpeed time.Duration = 0
+	nbError := 0
+	missing := 0
 
 	for i := 0; i < 10000; i++ {
 
 		grid = dices.Roll(r)
 		start = time.Now()
 		list := dico.AllWordInGrid(grid, origin)
+		list2 := dico.AllWordInGrid(grid, noParsed)
+		if len(list) != len(list2) {
+			missing += len(list2) - len(list)
+			nbError++
+		}
 		statSpeed += time.Since(start)
 		n := len(list)
 		if n < min {
@@ -44,7 +52,7 @@ func Display(grid [4][4]rune,
 	}
 	mean := float64(stat / 10000)
 
-	fmt.Printf("min : %d | max %d | ecart-type %f | mean %f | avg speed %dms |Q1 %f Q2%f | Q3%f \n",
+	fmt.Printf("min : %d | max %d | ecart-type %f | mean %f |avg speed %dms |Q1 %f Q2%f | Q3%f |error count %d | missing %d | mean %f \n",
 		min,
 		max,
 		mean,
@@ -53,6 +61,9 @@ func Display(grid [4][4]rune,
 		utils.NthTile(value, 1, 4),
 		utils.NthTile(value, 2, 4),
 		utils.NthTile(value, 3, 4),
+		nbError,
+		missing,
+		float64(missing)/10000.,
 	)
 	for i, e := range distrition {
 		fmt.Printf("Nombre de mots de longueur %d : %d \npourcentage  : %f%s\n", i, e, float64(e)*100/stat, "%")
