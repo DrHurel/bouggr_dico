@@ -13,8 +13,8 @@ func Display(grid [4][4]rune,
 	dices dico.Dices,
 	r *rand.Rand,
 	start time.Time,
-	origin *data_structure.Node[rune, int],
-	noParsed *data_structure.Node[rune, int],
+	origin *data_structure.Node,
+	noParsed *data_structure.Node,
 ) {
 	var stat float64 = 0
 	stat2 := 0.

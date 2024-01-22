@@ -30,7 +30,7 @@ import (
 // 	}
 // }
 
-func AllWordInGrid[T string | rune](Grid [4][4]T, dico *data_structure.Node[rune, int]) []string {
+func AllWordInGrid[T string | rune](Grid [4][4]T, dico *data_structure.Node) []string {
 
 	ch := make(chan string)
 	res := make([]string, 0)
@@ -52,7 +52,7 @@ func AllWordInGrid[T string | rune](Grid [4][4]T, dico *data_structure.Node[rune
 	return res
 }
 
-func allWordInGrid[T string | rune](Grid [4][4]T, dico *data_structure.Node[rune, int], ch chan string) {
+func allWordInGrid[T string | rune](Grid [4][4]T, dico *data_structure.Node, ch chan string) {
 
 	wg := new(sync.WaitGroup)
 	for i := range Grid {
@@ -81,16 +81,16 @@ func allWordInGrid[T string | rune](Grid [4][4]T, dico *data_structure.Node[rune
 
 func appendAllWordFromPoint[T string | rune](res chan string,
 	G [4][4]T,
-	dico *data_structure.Node[rune, int],
+	dico *data_structure.Node,
 	word string, i, j int, used [4][4]bool) {
 
-	if dico.CheckWord([]rune(word), 1, 1, func(a, b int) bool { return a == b }) {
+	if dico.CheckWord(word, 1) {
 		if len(word) != 0 {
 			res <- word
 		}
 	}
 
-	if !canPickAletter(i, j, used) || !dico.CanCreateWord([]rune(word)) {
+	if !canPickAletter(i, j, used) || !dico.CanCreateWord(word) {
 
 		return
 	}

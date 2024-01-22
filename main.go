@@ -135,10 +135,13 @@ func main() {
 
 	fmt.Print("\n")
 	utils.PrintGrid(grid)
-	fmt.Print("\n")
-	start = time.Now()
 
+	fmt.Print("\n")
+	fmt.Print(origin.CheckWord("AAS", 1), origin.CheckWord("ABAISSABLES", 1), origin.CheckWord("ABAISSjsoidngiodj,vABLES", 1), origin.CheckWord("ZINZINULENT", 1), origin.CheckWord("IAERBSRUGANOS", 1))
+	start = time.Now()
+	fmt.Println("Start")
 	allw := dico.AllWordInGrid(grid, origin)
+	fmt.Println("Stop")
 	elapsed = time.Since(start)
 
 	for _, e := range allw {

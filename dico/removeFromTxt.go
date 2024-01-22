@@ -80,8 +80,9 @@ func RemoveOfTxt(path string, dices Dices, rp RemovePatern, lmn IterationCount) 
 		//determination de la validité d'un mot
 		possible := isPossible(text, interationCount, maxAllowed, rp)
 
+		possible = true
 		// garde les mots valides
-		if possible && length <= 14 && length > 2 {
+		if possible && length <= 16 && length > 2 {
 			_, err := buf.WriteString(text + "\n")
 			if err != nil {
 				panic("Couldn't replace line")
