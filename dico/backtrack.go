@@ -84,7 +84,7 @@ func appendAllWordFromPoint[T string | rune](res chan string,
 	dico *data_structure.Node[rune, int],
 	word string, i, j int, used [4][4]bool) {
 
-	if dico.CheckWord([]rune(word), 1, func(a, b int) bool { return a == b }) {
+	if dico.CheckWord([]rune(word), 1, 1, func(a, b int) bool { return a == b }) {
 		if len(word) != 0 {
 			res <- word
 		}

@@ -2,13 +2,33 @@ package data_structure
 
 import (
 	"errors"
+	"math"
 )
+
+type LangueCode int
+
+func LangueCodeMap(lang []string) (res map[string]int) {
+
+	res = make(map[string]int, len(lang))
+
+	for i, l := range lang {
+		res[l] = int(math.Pow(2, float64(i)))
+	}
+
+	return
+}
+
+func (l LangueCode) IsIn(code LangueCode) bool {
+
+	return (code & l) > 0
+
+}
 
 type Node[T comparable, K any] struct {
 	Key        T             `json:"k"`
 	Value      K             `json:"v"`
 	Children   []*Node[T, K] `json:"c"`
-	parent     *Node[T, K]
+	Langue     LangueCode    `json:"l"`
 	accessible bool
 }
 
@@ -19,30 +39,11 @@ func NewNode[T comparable, K any](key T) *Node[T, K] {
 	return temp
 }
 
-func (this *Node[T, _]) Mark(w []T) {
-	next := this
-
-	for _, l := range w {
-		next.accessible = true
-		if temp, err := next.GetChild(l); err == nil {
-			next = temp
-
-		} else {
-			return
-		}
-	}
-
-}
-
 /*
 Quick way to know if a node has children
 */
 func (this *Node[T, K]) HasChildren() bool {
 	return len(this.Children) != 0
-}
-
-func (this *Node[T, K]) Parent() *Node[T, K] {
-	return this.parent
 }
 
 func (this *Node[T, K]) GetChild(key T) (*Node[T, K], error) {
@@ -58,9 +59,7 @@ func (this *Node[T, K]) GetChild(key T) (*Node[T, K], error) {
 
 func (this *Node[T, K]) Merge(node *Node[T, K]) bool {
 	if this.Key == node.Key {
-		for _, n := range node.Children {
-			n.parent = this
-		}
+
 		this.Children = append(this.Children, node.Children...)
 		return true
 	}
@@ -74,14 +73,14 @@ func (this *Node[T, K]) Add(node *Node[T, K]) {
 			return
 		}
 	}
-	node.parent = this
+
 	this.Children = append(this.Children, node)
 
 }
 
 // The `CheckWord` function is used to check if a given word exists in the tree and if its associated
 // value matches a given test value.
-func (this *Node[T, K]) CheckWord(w []T, test K, equal func(K, K) bool) bool {
+func (this *Node[T, K]) CheckWord(w []T, test K, lang LangueCode, equal func(K, K) bool) bool {
 
 	next := this
 	if len(w) < 3 {
@@ -97,7 +96,7 @@ func (this *Node[T, K]) CheckWord(w []T, test K, equal func(K, K) bool) bool {
 		}
 	}
 
-	return equal(next.Value, test)
+	return equal(next.Value, test) && lang.IsIn(next.Langue)
 
 }
 

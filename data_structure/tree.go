@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strings"
 	"ui"
 	"utils"
 )
@@ -12,10 +13,11 @@ const ORIGIN_KEY = 'O'
 
 // The function `GenerateFromTxt` reads a text file, creates a tree structure based on the characters
 // in the file, and returns the root node of the tree.
-func GenerateDicoFromTxt(input string) *Node[rune, int] {
+func GenerateDicoFromTxt(input string, lang map[string]int) *Node[rune, int] {
 
 	origin := new(Node[rune, int])
 
+	var currentLang int
 	origin.Key = ORIGIN_KEY
 
 	f, err := os.OpenFile(input, os.O_RDWR, 0644)
@@ -33,17 +35,23 @@ func GenerateDicoFromTxt(input string) *Node[rune, int] {
 		text = scanner.Text()
 
 		next := origin
+		if len(text) > 2 && text[1] == '=' {
+			currentLang = lang[strings.Split(text, "=")[1]]
+		} else {
 
-		for _, l := range text {
-			if temp, err := next.GetChild((l)); err == nil {
-				next = temp
-			} else {
-				temp = NewNode[rune, int]((l))
-				next.Add(temp)
-				next = temp
+			for _, l := range text {
+				if temp, err := next.GetChild((l)); err == nil {
+					next = temp
+				} else {
+					temp = NewNode[rune, int]((l))
+					next.Add(temp)
+					next = temp
+
+				}
 			}
+			next.Value = 1
+			next.Langue += LangueCode(currentLang)
 		}
-		next.Value = 1
 
 	}
 

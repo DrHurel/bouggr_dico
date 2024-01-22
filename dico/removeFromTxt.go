@@ -10,6 +10,8 @@ import (
 
 func isPossible(word string, interationCount IterationCount, maxAllowed IterationCount, rp RemovePatern) bool {
 	possible := true
+
+	// compte les lettres
 	for _, v := range word {
 
 		interationCount[string(v)]++ //ce que j'ai vraiment
@@ -19,6 +21,7 @@ func isPossible(word string, interationCount IterationCount, maxAllowed Iteratio
 	}
 
 	for v, n := range interationCount {
+
 		for i := 0; i < n; i++ {
 			for _, target := range rp[string(v)] {
 				borneSup := min(len(target), i)
@@ -32,6 +35,7 @@ func isPossible(word string, interationCount IterationCount, maxAllowed Iteratio
 				}
 			}
 		}
+
 	}
 
 	//on renvoit pas vrai pour le cas où la dernière lettre rend possible faux
@@ -77,7 +81,7 @@ func RemoveOfTxt(path string, dices Dices, rp RemovePatern, lmn IterationCount) 
 		possible := isPossible(text, interationCount, maxAllowed, rp)
 
 		// garde les mots valides
-		if possible && length <= 16 && length > 2 {
+		if possible && length <= 14 && length > 2 {
 			_, err := buf.WriteString(text + "\n")
 			if err != nil {
 				panic("Couldn't replace line")

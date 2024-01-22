@@ -95,12 +95,14 @@ func main() {
 
 	wg.Wait()
 	rp := dices.RemovePaternStruct(lmn, lom)
-	no_parse := data_structure.GenerateDicoFromTxt(input)
+	langs := data_structure.LangueCodeMap(ui.GetLangList(params))
+
+	noParse := data_structure.GenerateDicoFromTxt(input, langs)
 	if params[ui.NO_PARSE] == -1 {
 		dico.RemoveOfTxt(input, dices, rp, lmn)
 	}
 
-	origin := data_structure.GenerateDicoFromTxt(input)
+	origin := data_structure.GenerateDicoFromTxt(input, langs)
 	d := []rune{}
 	for _, dice := range dices {
 		d = append(d, dice...)
@@ -145,7 +147,7 @@ func main() {
 	fmt.Printf("\nTook %s\n", elapsed)
 
 	if params[ui.FORCE] != 1 {
-		stat.Display(grid, dices, r, start, origin, no_parse)
+		stat.Display(grid, dices, r, start, origin, noParse)
 	}
 
 	os.Exit(0)
