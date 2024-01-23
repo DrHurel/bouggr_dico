@@ -16,19 +16,19 @@ func NewNode(value int16) *Node {
 	return temp
 }
 
-func (this *Node) Convert() []interface{} {
+func (this *Node) Convert() interface{} {
 	a := []interface{}{
 		this.Value,
 	}
 
 	if !this.HasChildren() {
-		return a
+		return this.Value
 	}
 
 	b := []interface{}{}
 
 	for _, e := range this.Children {
-		b = append(b, e.Convert()...)
+		b = append(b, e.Convert())
 	}
 
 	a = append(a, b)
