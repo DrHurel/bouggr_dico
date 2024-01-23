@@ -5,18 +5,39 @@ import (
 )
 
 type Node struct {
-	Value    int32   `json:"v"`
-	Children []*Node `json:"c"`
+	_msgpack struct{} `msgpack:",as_array"`
+	Value    int16    `json:"v"`
+	Children []*Node  `json:"k"`
 }
 
-func NewNode(value int32) *Node {
+func NewNode(value int16) *Node {
 	temp := new(Node)
-	temp.Children = []*Node{}
 	temp.Value = value
 	return temp
 }
 
-func (this *Node) AddLang(lang int32) {
+func (this *Node) Convert() []interface{} {
+	a := []interface{}{
+		this.Value,
+	}
+
+	if !this.HasChildren() {
+		return a
+	}
+
+	b := []interface{}{}
+
+	for _, e := range this.Children {
+		b = append(b, e.Convert()...)
+	}
+
+	a = append(a, b)
+
+	return a
+
+}
+
+func (this *Node) AddLang(lang int16) {
 	if this.Value&lang == 0 {
 		this.Value += lang
 	}
@@ -35,7 +56,7 @@ func (this *Node) HasChildren() bool {
 	return len(this.Children) != 0
 }
 
-func SameKey(val1, val2 int32) bool {
+func SameKey(val1, val2 int16) bool {
 	//fmt.Printf("%s,%s,%s", string(Decode(val1)), string(Decode(val2)), "\n")
 	for i := 0; i < 8; i++ {
 		if val1&(1<<i) != val2&(1<<i) {
@@ -49,7 +70,7 @@ func (this *Node) GetChild(value rune) (*Node, error) {
 
 	for _, node := range this.Children {
 
-		if SameKey(node.Value, value) {
+		if SameKey(node.Value, int16(value)) {
 			return node, nil
 		}
 	}
@@ -80,7 +101,7 @@ func (this *Node) Add(node *Node) {
 
 // The `CheckWord` function is used to check if a given word exists in the tree and if its associated
 // value matches a given test value.
-func (this *Node) CheckWord(w string, lang LangueCode) bool {
+func (this *Node) CheckWord(w string, lang int16) bool {
 
 	next := this
 	if len(w) < 3 {
@@ -96,7 +117,7 @@ func (this *Node) CheckWord(w string, lang LangueCode) bool {
 		}
 	}
 	//	afmt.Print(w, next.Value&IS_A_WORD > 0, "\n")
-	return next.Value&IS_A_WORD > 0
+	return next.Value&IS_A_WORD > 0 && next.Value&lang > 0
 
 }
 

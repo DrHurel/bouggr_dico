@@ -124,7 +124,7 @@ func main() {
 		}()
 	}
 
-	utils.Encode(origin, output)
+	utils.EncodeNode(origin, output)
 	wg.Wait()
 	elapsed := time.Since(start)
 	fmt.Printf("Took %s\n", elapsed)
@@ -137,10 +137,10 @@ func main() {
 	utils.PrintGrid(grid)
 
 	fmt.Print("\n")
-	fmt.Print(origin.CheckWord("AAS", 1), origin.CheckWord("ABAISSABLES", 1), origin.CheckWord("ABAISSjsoidngiodj,vABLES", 1), origin.CheckWord("ZINZINULENT", 1), origin.CheckWord("IAERBSRUGANOS", 1))
+	fmt.Print(origin.CheckWord("AAS", langs["FR"]), origin.CheckWord("ABAISSABLES", langs["FR"]), origin.CheckWord("ABAISSjsoidngiodj,vABLES", langs["FR"]), origin.CheckWord("ZINZINULENT", langs["FR"]), origin.CheckWord("IAERBSRUGANOS", langs["FR"]))
 	start = time.Now()
 	fmt.Println("Start")
-	allw := dico.AllWordInGrid(grid, origin)
+	allw := dico.AllWordInGrid(grid, origin, langs["FR"])
 	fmt.Println("Stop")
 	elapsed = time.Since(start)
 
@@ -150,7 +150,7 @@ func main() {
 	fmt.Printf("\nTook %s\n", elapsed)
 
 	if params[ui.FORCE] != 1 {
-		stat.Display(grid, dices, r, start, origin, noParse)
+		stat.Display(grid, dices, r, start, origin, noParse, langs["FR"])
 	}
 
 	os.Exit(0)

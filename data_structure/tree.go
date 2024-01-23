@@ -12,11 +12,11 @@ const ORIGIN_KEY = 'O'
 
 // The function `GenerateFromTxt` reads a text file, creates a tree structure based on the characters
 // in the file, and returns the root node of the tree.
-func GenerateDicoFromTxt(input string, lang map[string]int32) *Node {
+func GenerateDicoFromTxt(input string, lang map[string]int16) *Node {
 
 	origin := new(Node)
 
-	var currentLang int32
+	var currentLang int16
 	origin.Value = ORIGIN_KEY
 
 	f, err := os.OpenFile(input, os.O_RDWR, 0644)
@@ -42,7 +42,7 @@ func GenerateDicoFromTxt(input string, lang map[string]int32) *Node {
 				if temp, err := next.GetChild((l)); err == nil {
 					next = temp
 				} else {
-					temp = NewNode((l))
+					temp = NewNode(int16(l))
 					next.Add(temp)
 					next = temp
 

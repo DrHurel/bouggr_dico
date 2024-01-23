@@ -15,6 +15,7 @@ func Display(grid [4][4]rune,
 	start time.Time,
 	origin *data_structure.Node,
 	noParsed *data_structure.Node,
+	langs int16,
 ) {
 	var stat float64 = 0
 	stat2 := 0.
@@ -34,8 +35,8 @@ func Display(grid [4][4]rune,
 
 		grid = dices.Roll(r)
 		start = time.Now()
-		list := dico.AllWordInGrid(grid, origin)
-		list2 := dico.AllWordInGrid(grid, noParsed)
+		list := dico.AllWordInGrid(grid, origin, langs)
+		list2 := dico.AllWordInGrid(grid, noParsed, langs)
 		if len(list) != len(list2) {
 			missing += len(list2) - len(list)
 			nbError++
