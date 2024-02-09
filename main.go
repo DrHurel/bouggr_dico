@@ -137,7 +137,14 @@ func main() {
 	utils.PrintGrid(grid)
 
 	fmt.Print("\n")
-	fmt.Print(origin.CheckWord("AAS", langs["FR"]), origin.CheckWord("ABAISSABLES", langs["FR"]), origin.CheckWord("ABAISSjsoidngiodj,vABLES", langs["FR"]), origin.CheckWord("ZINZINULENT", langs["FR"]), origin.CheckWord("IAERBSRUGANOS", langs["FR"]))
+	fmt.Print(origin.CheckWord(
+		"AAS",
+		langs["FR"]),
+		origin.CheckWord("ABAISSABLES", langs["FR"]),
+		origin.CheckWord("ABAISSjsoidngiodj,vABLES", langs["FR"]),
+		origin.CheckWord("ZINZINULENT", langs["FR"]),
+		origin.CheckWord("IAERBSRUGANOS", langs["FR"]),
+	)
 	start = time.Now()
 	fmt.Println("Start")
 	allw := dico.AllWordInGrid(grid, origin, langs["FR"])

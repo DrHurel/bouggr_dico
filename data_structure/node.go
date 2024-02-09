@@ -5,9 +5,8 @@ import (
 )
 
 type Node struct {
-	_msgpack struct{} `msgpack:",as_array"`
-	Value    int16    `json:"v"`
-	Children []*Node  `json:"k"`
+	Value    int16   `json:"v"`
+	Children []*Node `json:"k"`
 }
 
 func NewNode(value int16) *Node {
