@@ -1,6 +1,7 @@
 package dico
 
 import (
+	"bufio"
 	"encoding/json"
 	"log"
 	"os"
@@ -8,9 +9,25 @@ import (
 )
 
 func TestGetAllWord(t *testing.T) {
+	dicoTxt := "C:/Users/myyou/AppData/Local/git-r/boggle_dico/fr_dico_copy.txt"
+
+	readFile, err := os.Open(dicoTxt)
+
+	if err != nil {
+		log.Fatalf("failed to open")
+	}
+	fileScanner := bufio.NewScanner(readFile)
+
+	fileScanner.Split(bufio.ScanLines)
+
+	mapDico := make(map[string]bool, 407935)
+	for fileScanner.Scan() {
+		mapDico[fileScanner.Text()] = true
+	}
 
 	grid := "OVERFCEANAEBRUAS"
 	dicofile, err := os.ReadFile("C:/Users/myyou/AppData/Local/git-r/boggle_dico/out/fr_dico.json")
+
 	if err != nil {
 		t.Errorf("Error opening file %s", err)
 		t.Fail()
@@ -43,10 +60,22 @@ func TestGetAllWord(t *testing.T) {
 			t.Errorf("Expected <410000, got %d", len(res))
 			t.Fail()
 		}
-		for _, e := range res[0:10] {
-			log.Println(e)
+		count := 0
+		for _, e := range res {
+
+			if _, ok := mapDico[e]; !ok {
+				count++
+				t.Errorf("Expected %s, not in dico", e)
+
+			}
 		}
-		t.Log("Success")
+
+		if count > 0 {
+
+			t.Errorf("Not %d, got %d out of %d (%d)", 0, count, len(res), len(res)-count)
+			t.Fail()
+		}
+
 	}
 
 }

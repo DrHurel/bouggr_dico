@@ -57,12 +57,7 @@ func (this *Node) HasChildren() bool {
 
 func SameKey(val1, val2 int16) bool {
 	//fmt.Printf("%s,%s,%s", string(Decode(val1)), string(Decode(val2)), "\n")
-	for i := 0; i < 8; i++ {
-		if val1&(1<<i) != val2&(1<<i) {
-			return false
-		}
-	}
-	return true
+	return val1&((1<<8)-1) == val2&((1<<8)-1)
 }
 
 func (this *Node) GetChild(value rune) (*Node, error) {

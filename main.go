@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"data_structure"
 	"dico"
 	"fmt"
+	"log"
 	"stat"
 
 	"math/rand"
@@ -151,9 +153,30 @@ func main() {
 	fmt.Println("Stop")
 	elapsed = time.Since(start)
 
+	dicoTxt := "C:/Users/myyou/AppData/Local/git-r/boggle_dico/fr_dico_copy.txt"
+
+	readFile, err := os.Open(dicoTxt)
+
+	if err != nil {
+		log.Fatalf("failed to open")
+	}
+	fileScanner := bufio.NewScanner(readFile)
+
+	fileScanner.Split(bufio.ScanLines)
+
+	mapDico := make(map[string]bool, 407935)
+	for fileScanner.Scan() {
+		mapDico[fileScanner.Text()] = true
+	}
+
 	for _, e := range allw {
 		fmt.Println(e)
+		if !mapDico[e] {
+			fmt.Println("Not found")
+
+		}
 	}
+
 	fmt.Printf("\nTook %s\n", elapsed)
 
 	if params[ui.FORCE] != 1 {

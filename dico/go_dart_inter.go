@@ -17,17 +17,17 @@ func GetAllWord(grid string, dico [2]interface{}) []string {
 
 		for i := 0; i < 4; i++ {
 			for j := 0; j < 4; j++ {
-				used := [4][4]bool{}
-				used[i][j] = true
+
 				go func(iwg *sync.WaitGroup, i, j int, dico [2]interface{}) {
 					defer iwg.Done()
+					used := [4][4]bool{}
+					used[i][j] = true
 					for _, n := range dico[1].([]interface{}) {
 						children, ok := n.([]interface{})
 						if !ok {
 							continue
 						}
 						if (int(children[0].(float64)) & int(grid[i*4+j])) == int(grid[i*4+j]) {
-
 							appendFromPoint(buf, grid, string(grid[i*4+j]), i, j, used, [2]interface{}(children))
 						}
 					}
@@ -42,13 +42,25 @@ func GetAllWord(grid string, dico [2]interface{}) []string {
 	}(wg)
 
 	for e := range buf {
-		res = append(res, e)
+
+		if !contains(res, e) {
+			res = append(res, e)
+		}
 
 	}
 
 	wg.Wait()
 
 	return res
+}
+
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }
 
 func appendFromPoint(res chan string, grid string, word string, x, y int, used [4][4]bool, node [2]interface{}) {
@@ -58,7 +70,8 @@ func appendFromPoint(res chan string, grid string, word string, x, y int, used [
 	}
 
 	if val, ok := node[0].(float64); ok { // If the node is a number (should be useless but who knows)
-		if int(val)&(1<<8) > 1 {
+		if (int16(val) & (1 << 8)) > 0 {
+			log.Println("word", word, string(grid[x*4+y]), val, val-(1<<8)-(1<<9))
 			res <- word
 		}
 	}
@@ -66,8 +79,8 @@ func appendFromPoint(res chan string, grid string, word string, x, y int, used [
 	if len(node) == 1 { // If the node is a leaf
 		return
 	}
-	for i := -1; i < 2; i++ {
-		for j := -1; j < 2; j++ {
+	for _, i := range []int{-1, 0, 1} {
+		for _, j := range []int{-1, 0, 1} {
 			ix := x + i
 			jy := y + j
 			index := ix*4 + jy
@@ -83,10 +96,11 @@ func appendFromPoint(res chan string, grid string, word string, x, y int, used [
 				if !ok || len(child) < 1 {
 					continue
 				}
-				if v, ok := child[0].(float64); ok && (int(v)&int(grid[index])) == int(grid[index]) {
+				if v, ok := child[0].(float64); ok && byte(v) == byte(grid[index]) {
 					used[ix][jy] = true
 					appendFromPoint(res, grid, word+string(grid[index]), ix, jy, used, [2]interface{}(child))
 					used[ix][jy] = false
+					break
 				}
 
 			}
