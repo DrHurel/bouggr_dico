@@ -84,28 +84,47 @@ func TestGetAllWord(t *testing.T) {
 			t.Fail()
 		}
 		count := 0
+		mapRes1 := make(map[string]bool, len(res))
 		for _, e := range res {
+			mapRes1[e] = true
+			if _, ok := mapDico[e]; !ok { //ensure that the word are also found in the dico
 
-			if _, ok := mapDico[e]; !ok {
+				t.Errorf("Expected %s, not in dico", e)
+
 				count++
 				//t.Errorf("Expected %s, not in dico", e)
 
 			}
 		}
 
+		count2 := 0
+		count3 := 0
 		for _, e := range res2 {
-
-			if _, ok := mapDico[e]; !ok {
-				count++
-				//t.Errorf("Expected %s, not in dico2", e)
+			if mapRes1[e] == false { //ensure that the word are also found in the first result
+				count3++
+			}
+			if _, ok := mapDico[e]; !ok { //ensure that the word are also found in the dico
+				count2++
+				t.Errorf("Expected %s, not in dico2", e)
 
 			}
 
 		}
 
+		if count2 > 0 { // in first to verify that the second function is refenrentialy correct
+			t.Errorf("Not ref %d, got %d out of %d (%d) (%d)", 0, count2, len(res2), len(res2)-count2, len(res))
+			t.Fail()
+		}
+
 		if count > 0 {
 
 			t.Errorf("Not %d, got %d out of %d (%d) (%d)", 0, count, len(res), len(res)-count, len(res2))
+			t.Fail()
+		}
+
+		if count3 > 0 {
+
+			t.Errorf("Not 3 %d, got %d out of %d (%d) (%d)", 0, count3, len(res2), len(res2)-count3, len(res))
 			t.Fail()
 		}
 

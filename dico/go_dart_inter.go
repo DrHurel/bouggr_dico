@@ -1,6 +1,7 @@
 package dico
 
 import (
+	"errors"
 	"sync"
 )
 
@@ -50,11 +51,13 @@ func initPoint(buf chan string, grid string, iwg *sync.WaitGroup, i, j int, dico
 	used[i][j] = true
 	for _, n := range dico[1].([]interface{}) {
 		child := n.([]interface{})
-		if (int(child[0].(int32)) & int(point)) == int(point) {
+		if (byte(child[0].(int32)) & point) == point {
 			appendFromPoint(buf, grid, string(point), i, j, used, child)
 		}
 	}
 }
+
+var MOVE = []int{-1, 0, 1}
 
 func appendFromPoint(res chan string, grid string, word string, i, j int, used [4][4]bool, node []interface{}) {
 	n := len(node)
@@ -63,15 +66,15 @@ func appendFromPoint(res chan string, grid string, word string, i, j int, used [
 	if (value & (1 << 8)) > 0 {
 		res <- word
 	}
-	if n != 2 {
+	if n != 2 { //if no children -> leaf
 		return
 	}
 	var ix, jy, index int
 
 	children := node[1].([]interface{})
 
-	for _, a := range []int{-1, 0, 1} {
-		for _, b := range []int{-1, 0, 1} {
+	for _, a := range MOVE {
+		for _, b := range MOVE {
 			ix = a + i
 			jy = b + j
 			index = ix*4 + jy
@@ -83,39 +86,39 @@ func appendFromPoint(res chan string, grid string, word string, i, j int, used [
 			}
 
 			newLetter := grid[index]
-			for _, n := range children {
-				child, ok := n.([]interface{})
 
-				if !ok && byte(n.(int32)) == byte(newLetter) {
-					used[ix][jy] = true
-					appendFromPoint(res, grid, word+string(newLetter), ix, jy, used, []interface{}{n})
-					used[ix][jy] = false
-					break
-				}
-
-				if !ok {
-					continue
-				}
-
-				if byte(child[0].(int32)) == byte(newLetter) {
-					used[ix][jy] = true
-					appendFromPoint(res, grid, word+string(newLetter), ix, jy, used, child)
-					used[ix][jy] = false
-					break
-				}
-
+			n, err := getChild(children, newLetter)
+			if err != nil {
+				continue
 			}
+			used[ix][jy] = true
+			if child, ok := n.([]interface{}); !ok {
+				appendFromPoint(res, grid, word+string(newLetter), ix, jy, used, []interface{}{n})
+			} else {
+				appendFromPoint(res, grid, word+string(newLetter), ix, jy, used, child)
+			}
+			used[ix][jy] = false
+
 		}
 	}
 }
 
-func sendToChan(node [2]interface{}, res chan string, word string) {
+func getChild(children []interface{}, newLetter byte) (interface{}, error) {
+	for _, n := range children {
+		child, ok := n.([]interface{})
 
-	if val, ok := node[0].(int32); ok {
-
-		if (int32(val) & (1 << 8)) > 0 {
-			//log.Println(node[0], word, string(byte(val)))
-			res <- word
+		if !ok && byte(n.(int32)) == newLetter { // if no children -> leaf
+			return n, nil
 		}
+
+		if !ok {
+			continue
+		}
+
+		if byte(child[0].(int32)) == newLetter { //with children
+			return child, nil
+		}
+
 	}
+	return nil, errors.New("not found")
 }

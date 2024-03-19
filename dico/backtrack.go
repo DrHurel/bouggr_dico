@@ -31,7 +31,7 @@ import (
 
 func AllWordInGrid[T rune](Grid [4][4]T, dico *data_structure.Node, lang int32) []string {
 
-	ch := make(chan string)
+	ch := make(chan string, 1024)
 	resMap := make(map[string]bool)
 
 	wg := new(sync.WaitGroup)
