@@ -15,7 +15,7 @@ func Display(grid [4][4]rune,
 	start time.Time,
 	origin *data_structure.Node,
 	noParsed *data_structure.Node,
-	langs int16,
+	langs int32,
 ) {
 	var stat float64 = 0
 	stat2 := 0.

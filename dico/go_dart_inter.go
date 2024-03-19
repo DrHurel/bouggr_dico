@@ -1,52 +1,24 @@
 package dico
 
 import (
-	"log"
 	"sync"
 )
 
-func GetAllWord(grid string, dico [2]interface{}) []string {
-	buf := make(chan string)
-	res := make([]string, 0)
+func GetAllWord(grid string, dico []interface{}) []string {
+	buf := make(chan string, 1024)
+	resMap := make(map[string]bool)
+
 	wg := new(sync.WaitGroup)
 
 	wg.Add(1)
-	go func(wg *sync.WaitGroup) {
-		iwg := new(sync.WaitGroup)
-		iwg.Add(16)
-
-		for i := 0; i < 4; i++ {
-			for j := 0; j < 4; j++ {
-
-				go func(iwg *sync.WaitGroup, i, j int, dico [2]interface{}) {
-					defer iwg.Done()
-					used := [4][4]bool{}
-					used[i][j] = true
-					for _, n := range dico[1].([]interface{}) {
-						children, ok := n.([]interface{})
-						if !ok {
-							continue
-						}
-						if (int(children[0].(float64)) & int(grid[i*4+j])) == int(grid[i*4+j]) {
-							appendFromPoint(buf, grid, string(grid[i*4+j]), i, j, used, [2]interface{}(children))
-						}
-					}
-				}(iwg, i, j, dico)
-			}
-		}
-
-		iwg.Wait()
-		close(buf)
-		defer wg.Done()
-
-	}(wg)
+	go startAtAllPoint(buf, grid, dico, wg)
 
 	for e := range buf {
-
-		if !contains(res, e) {
-			res = append(res, e)
-		}
-
+		resMap[e] = true
+	}
+	res := make([]string, 0, len(resMap))
+	for k := range resMap {
+		res = append(res, k)
 	}
 
 	wg.Wait()
@@ -54,57 +26,96 @@ func GetAllWord(grid string, dico [2]interface{}) []string {
 	return res
 }
 
-func contains(s []string, e string) bool {
-	for _, a := range s {
-		if a == e {
-			return true
+func startAtAllPoint(buf chan string, grid string, dico []interface{}, wg *sync.WaitGroup) {
+	iwg := new(sync.WaitGroup)
+	iwg.Add(16)
+
+	for _, i := range [4]int{0, 1, 2, 3} {
+		for _, j := range [4]int{0, 1, 2, 3} {
+
+			go initPoint(buf, grid, iwg, i, j, dico,
+				grid[i*4+j])
 		}
 	}
-	return false
+
+	iwg.Wait()
+	close(buf)
+	defer wg.Done()
+
 }
 
-func appendFromPoint(res chan string, grid string, word string, x, y int, used [4][4]bool, node [2]interface{}) {
-	if len(node) == 0 {
-		log.Println("empty")
-		return
-	}
-
-	if val, ok := node[0].(float64); ok { // If the node is a number (should be useless but who knows)
-		if (int16(val) & (1 << 8)) > 0 {
-			log.Println("word", word, string(grid[x*4+y]), val, val-(1<<8)-(1<<9))
-			res <- word
+func initPoint(buf chan string, grid string, iwg *sync.WaitGroup, i, j int, dico []interface{}, point byte) {
+	defer iwg.Done()
+	var used [4][4]bool
+	used[i][j] = true
+	for _, n := range dico[1].([]interface{}) {
+		child := n.([]interface{})
+		if (int(child[0].(int32)) & int(point)) == int(point) {
+			appendFromPoint(buf, grid, string(point), i, j, used, child)
 		}
 	}
+}
 
-	if len(node) == 1 { // If the node is a leaf
+func appendFromPoint(res chan string, grid string, word string, i, j int, used [4][4]bool, node []interface{}) {
+	n := len(node)
+	var value int = int(node[0].(int32))
+
+	if (value & (1 << 8)) > 0 {
+		res <- word
+	}
+	if n != 2 {
 		return
 	}
-	for _, i := range []int{-1, 0, 1} {
-		for _, j := range []int{-1, 0, 1} {
-			ix := x + i
-			jy := y + j
-			index := ix*4 + jy
-			if ix < 0 || ix > 3 || jy < 0 || jy > 3 { // If the point is out of the grid
+	var ix, jy, index int
+
+	children := node[1].([]interface{})
+
+	for _, a := range []int{-1, 0, 1} {
+		for _, b := range []int{-1, 0, 1} {
+			ix = a + i
+			jy = b + j
+			index = ix*4 + jy
+			if ix < 0 || jy < 0 || ix > 3 || jy > 3 {
 				continue
 			}
-			children, ok := node[1].([]interface{})
-			if used[ix][jy] || !ok { // If the point is already used or the node is not a list
+			if used[ix][jy] {
 				continue
 			}
+
+			newLetter := grid[index]
 			for _, n := range children {
 				child, ok := n.([]interface{})
-				if !ok || len(child) < 1 {
+
+				if !ok && byte(n.(int32)) == byte(newLetter) {
+					used[ix][jy] = true
+					appendFromPoint(res, grid, word+string(newLetter), ix, jy, used, []interface{}{n})
+					used[ix][jy] = false
+					break
+				}
+
+				if !ok {
 					continue
 				}
-				if v, ok := child[0].(float64); ok && byte(v) == byte(grid[index]) {
+
+				if byte(child[0].(int32)) == byte(newLetter) {
 					used[ix][jy] = true
-					appendFromPoint(res, grid, word+string(grid[index]), ix, jy, used, [2]interface{}(child))
+					appendFromPoint(res, grid, word+string(newLetter), ix, jy, used, child)
 					used[ix][jy] = false
 					break
 				}
 
 			}
+		}
+	}
+}
 
+func sendToChan(node [2]interface{}, res chan string, word string) {
+
+	if val, ok := node[0].(int32); ok {
+
+		if (int32(val) & (1 << 8)) > 0 {
+			//log.Println(node[0], word, string(byte(val)))
+			res <- word
 		}
 	}
 }
