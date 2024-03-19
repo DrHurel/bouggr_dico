@@ -49,24 +49,25 @@ func initPoint(buf chan string, grid string, iwg *sync.WaitGroup, i, j int, dico
 	defer iwg.Done()
 	var used [4][4]bool
 	used[i][j] = true
-	for _, n := range dico[1].([]interface{}) {
-		child := n.([]interface{})
-		if (byte(child[0].(int32)) & point) == point {
-			appendFromPoint(buf, grid, string(point), i, j, used, child)
-		}
+	children := dico[1].([]interface{})
+	n, err := getChild(children, point)
+	if err != nil { //if no children for this letter
+		return
 	}
+	child := n.([]interface{})
+
+	appendFromPoint(buf, grid, string(point), i, j, used, child)
+
 }
 
-var MOVE = []int{-1, 0, 1}
+var MOVE = [3]int{-1, 0, 1}
 
 func appendFromPoint(res chan string, grid string, word string, i, j int, used [4][4]bool, node []interface{}) {
-	n := len(node)
-	var value int = int(node[0].(int32))
 
-	if (value & (1 << 8)) > 0 {
+	if (node[0].(int32) & 0b100000000) > 0 {
 		res <- word
 	}
-	if n != 2 { //if no children -> leaf
+	if 2 != len(node) { //if no children -> leaf
 		return
 	}
 	var ix, jy, index int
@@ -78,17 +79,17 @@ func appendFromPoint(res chan string, grid string, word string, i, j int, used [
 			ix = a + i
 			jy = b + j
 			index = ix*4 + jy
-			if ix < 0 || jy < 0 || ix > 3 || jy > 3 {
+			if ix < 0 || jy < 0 || ix > 3 || jy > 3 { //out of range
 				continue
 			}
-			if used[ix][jy] {
+			if used[ix][jy] { // can't use the same letter twice
 				continue
 			}
 
 			newLetter := grid[index]
 
 			n, err := getChild(children, newLetter)
-			if err != nil {
+			if err != nil { //if no children for this letter
 				continue
 			}
 			used[ix][jy] = true
