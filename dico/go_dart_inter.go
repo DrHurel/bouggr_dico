@@ -6,7 +6,7 @@ import (
 )
 
 func GetAllWord(grid string, dico []interface{}) []string {
-	buf := make(chan string, 1024)
+	buf := make(chan string, 1024) //buffered channel to avoid deadlock
 	resMap := make(map[string]bool)
 
 	wg := new(sync.WaitGroup)
